@@ -9,13 +9,14 @@ import './Blog.css';
 class Blog extends Component {
     state = {
         posts: [],
-        selectedPostId: null
+        selectedPostId: null,
+        error: false
     }
 
 
 
     componentDidMount() {
-        axios.get('https://jsonplaceholder.cypress.io/posts')
+        axios.get('/posts')
             .then(response => {
                 const posts = response.data.slice(0, 4);
                 const updatedPosts = posts.map(post => {
@@ -26,6 +27,10 @@ class Blog extends Component {
                 })
                 this.setState({ posts: updatedPosts });
                 console.log(this.state.posts);
+            })
+            .catch(error => {
+                console.log(error);
+                this.setState({error: true});
             });
     }
 
@@ -34,7 +39,9 @@ class Blog extends Component {
     }
 
     render() {
-        const posts = this.state.posts.map(post => {
+        let posts = <p style={{textAlign: 'center'}}>Something went wrong!</p>
+        if (!this.state.error) {
+        posts = this.state.posts.map(post => {
             return <Post
                 key={post.id}
                 title={post.title}
@@ -42,6 +49,7 @@ class Blog extends Component {
                 clicked={() => this.postSelectedHandler(post.id)}
             />;
         });
+    }
 
         return (
             <div>
